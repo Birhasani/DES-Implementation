@@ -1,3 +1,8 @@
+import logging
+from datetime import datetime
+import os
+from third import generate_random_key  # Import fungsi untuk key acak
+
 # Fungsi untuk mengubah string menjadi binary
 def string_to_binary(user_input):
     binary_representation = ''
