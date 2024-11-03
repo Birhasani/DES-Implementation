@@ -1,10 +1,10 @@
 import socket
-from DES_algorithm import DES_algorithm
+from DES import DES
 
 
 def client_program():
     # Buat instance DES_algorithm untuk peran "Sender"
-    des = DES_algorithm(role="Sender")
+    des = DES(role="Client")
     
     # Konfigurasi host dan port yang akan terhubung dengan server
     host = socket.gethostname()  # Mendapatkan nama host dari mesin saat ini
@@ -13,6 +13,10 @@ def client_program():
     # Membuat dan menghubungkan socket client ke host dan port server
     client_socket = socket.socket()
     client_socket.connect((host, port))
+
+    # Terima kunci dari server setelah koneksi terbentuk
+    key = client_socket.recv(1024).decode('utf-8')  # Tambahkan ini untuk menerima kunci dari server
+    des = DES(role="Client", key=key)  # Gunakan kunci yang diterima untuk DES
 
     while True:
         # Ambil input pesan dari pengguna untuk dikirim ke server

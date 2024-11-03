@@ -1,63 +1,61 @@
 import socket
-from DES_algorithm import DES_algorithm
+import random
+from DES import DES
 
-def server_program():
-    # Buat instance dari DES_algorithm untuk peran "Receiver"
-    des = DES_algorithm(role="Receiver")
+def Server_program():
+    key = ''.join(random.choice('01') for _ in range(64))  # Tambahkan kode ini untuk membuat kunci
+    des = DES(role="Server", key=key)  # Berikan kunci ke DES
     
-    # Konfigurasi alamat host dan port server
-    host = socket.gethostname()  # Mendapatkan nama host dari mesin saat ini
-    port = 5000  # Port yang digunakan server untuk mendengarkan
+    host = socket.gethostname()
+    port = 5000 
 
-    # Membuat socket untuk server dan bind ke host serta port yang ditentukan
     server_socket = socket.socket() 
     server_socket.bind((host, port)) 
 
-    # Server mulai mendengarkan koneksi
     server_socket.listen(2)
-    conn, address = server_socket.accept()  # Menerima koneksi masuk dari client
+    conn, address = server_socket.accept() 
     print("Connection from: " + str(address))
+
+     # Kirim kunci ke klien setelah koneksi terbentuk
+    conn.sendall(key.encode('utf-8'))  # Tambahkan ini untuk mengirim kunci ke klien
+    des.log_with_timestamp(f"Key sent to client: {key}")
     
     while True:
-        # Menerima data dari client
         data = conn.recv(1024)
         if not data:
-            break  # Jika tidak ada data, keluar dari loop
+            break
 
-        # Decode pesan dari bytes ke string
         raw_message = data.decode('utf-8')
         des.log_with_timestamp(f"Cipher text received: {raw_message}")
 
         if raw_message.lower() == 'stop':
-            # Jika pesan adalah "stop", kirim kembali ke client sebagai sinyal berhenti
             print("Stop signal received from sender. Closing connection.")
-            conn.sendall(bytes("stop", 'utf-8'))
-            break  # Keluar dari loop
+            conn.sendall(bytes("stop", 'utf-8'))  # Kirim sinyal “stop” kembali ke sender
+            break  # Akhiri loop untuk menutup koneksi
 
-        # Dekripsi pesan yang diterima dan tampilkan
         plain_text = des.decryption_cbc(raw_message)
         des.log_with_timestamp(f"Plain text received: {plain_text}")
         print("Plain text received: " + str(plain_text))
 
-        # Ambil input pesan dari server untuk dikirim kembali ke client
         message = input(' -> ')
-        # Enkripsi pesan sebelum dikirim dan tampilkan log
         cipher_text = des.encryption_cbc(message, output_format="hex")
         des.log_with_timestamp(f"Cipher text sent: {cipher_text}")
 
         if message.lower() == 'stop':
-            # Jika pesan yang dikirim adalah "stop", kirim sinyal berhenti ke client
-            conn.sendall(bytes("stop", 'utf-8'))
+            conn.sendall(bytes("stop", 'utf-8'))  # Kirim sinyal “stop” ke sender
             print("Stop signal sent to sender. Closing connection.")
-            break  # Keluar dari loop
+            break  # Akhiri loop untuk menutup koneksi
 
-        # Kirim pesan terenkripsi ke client
         conn.sendall(bytes(cipher_text, 'utf-8'))
 
-    # Menutup koneksi setelah keluar dari loop
     conn.close()
     print("Connection fully closed by both parties.")
 
-# Menjalankan program server jika file ini dijalankan secara langsung
+
+
 if __name__ == '__main__':
-    server_program()
+    Server_program()
+    
+    
+    
+    
