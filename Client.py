@@ -3,8 +3,7 @@ from DES import DES
 
 
 def client_program():
-    # Buat instance DES_algorithm untuk peran "Sender"
-    des = DES(role="Client")
+
     
     # Konfigurasi host dan port yang akan terhubung dengan server
     host = socket.gethostname()  # Mendapatkan nama host dari mesin saat ini
@@ -15,7 +14,9 @@ def client_program():
     client_socket.connect((host, port))
 
     # Terima kunci dari server setelah koneksi terbentuk
-    key = client_socket.recv(1024).decode('utf-8')  # Tambahkan ini untuk menerima kunci dari server
+    key = client_socket.recv(1024).decode('utf-8')
+    print(f"Kunci diterima dari server: {key}")
+    
     des = DES(role="Client", key=key)  # Gunakan kunci yang diterima untuk DES
 
     while True:

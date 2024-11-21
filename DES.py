@@ -1,31 +1,27 @@
 import logging
-import random
 from datetime import datetime
 import os
-from third import generate_random_key  
 
 class DES():
     iv = "1010101111001101111001101001011100010010101011110001011110101010"
 
-    def __init__(self, role, key=None):
+    def __init__(self, role, key):
         # Pastikan role diberikan (Client atau Server)
-        if role not in ["Client", "Server"]:
-            raise ValueError("Role harus 'Client' atau 'Server'")
+        if not key:
+            raise ValueError("Key harus diberikan.")
         
         # Inisialisasi role, log_number, dan key
         self.role = role
         self.log_number = self.get_next_log_number()
-        self.key = key or self.generate_random_key()
+        self.key = key
         self.reset_logger()  # Bersihkan logger lama dan inisialisasi logger baru dengan key
         
-    def generate_random_key(self):
-        return ''.join(random.choice('01') for _ in range(64))
 
     def get_next_log_number(self):
-        # Menentukan nomor log berikutnya berdasarkan file log yang ada
         existing_logs = [f for f in os.listdir() if f.endswith(".log") and self.role in f]
         log_numbers = [int(f.split("_")[0]) for f in existing_logs if f.split("_")[0].isdigit()]
-        return max(log_numbers) + 1 if log_numbers else 1
+        return max(log_numbers, default=0) + 1
+
 
     def reset_logger(self):
         # Bersihkan logger sebelumnya dan buat file log baru

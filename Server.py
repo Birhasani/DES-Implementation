@@ -1,9 +1,11 @@
 import socket
-import random
+import secrets
 from DES import DES
 
 def Server_program():
-    key = ''.join(random.choice('01') for _ in range(64))  # Tambahkan kode ini untuk membuat kunci
+    key = ''.join(secrets.choice('01') for _ in range(64))
+    print(f"Kunci yang dihasilkan di Server: {key}")
+
     des = DES(role="Server", key=key)  # Berikan kunci ke DES
     
     host = socket.gethostname()
